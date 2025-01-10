@@ -5,7 +5,18 @@
   "author": "Podter",
   "private": true,
   "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/main.ts",
+    "build": "NODE_ENV=production bun run typecheck && bun build --compile --minify-syntax --minify-whitespace --sourcemap src/main.ts --outfile out/grad",
+    "lint": "biome check .",
+    "fix": "biome check --write .",
+    "typecheck": "tsc --noEmit -p .",
+    "docker:up": "docker compose -f compose-dev.yml up -d",
+    "docker:down": "docker compose -f compose-dev.yml down",
+    "docker:rm": "docker compose -f compose-dev.yml down -v --remove-orphans"
+  },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@types/bun": "^1.1.16",
     "typescript": "^5.7.3"
   }
