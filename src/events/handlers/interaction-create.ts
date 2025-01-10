@@ -27,11 +27,11 @@ export const InteractionCreate = new AppEvent({
       const tock = performance.now();
 
       consola.info(
-        `\`${interaction.commandName}\` executed by \`${interaction.user.username}\` took \`${((tock - tick) / 1000).toFixed(2)}s\``,
+        `\`${interaction.commandName}\` executed by \`${interaction.user.globalName}\` took \`${((tock - tick) / 1000).toFixed(2)}s\``,
       );
     } catch (error) {
       consola.error(
-        `Failed to execute \`${interaction.commandName}\` for \`${interaction.user.username}\`:`,
+        `Failed to execute \`${interaction.commandName}\` for \`${interaction.user.globalName}\`:`,
         error,
       );
     }
