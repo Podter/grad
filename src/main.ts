@@ -7,6 +7,6 @@ consola.start("Starting Grad...");
 
 (globalThis as unknown as { tick: number }).tick = performance.now();
 
-mkdir(env.BRAD_DATA);
+mkdir(env.GRAD_DATA);
 
-(globalThis as unknown as { brad: Grad }).brad = new Grad();
+(globalThis as unknown as { grad: Grad }).grad = new Grad();

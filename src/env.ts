@@ -6,7 +6,7 @@ export const env = createEnv({
     TOKEN: z.string(),
     APPLICATION_ID: z.string(),
     DEV_GUILD_ID: z.string(),
-    BRAD_DATA: z.string().optional().default("./data"),
+    GRAD_DATA: z.string().optional().default("./data"),
     NODE_ENV: z.enum(["development", "production"]).default("development"),
   },
   runtimeEnv: Bun.env,
