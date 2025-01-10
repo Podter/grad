@@ -6,6 +6,9 @@ export const env = createEnv({
     TOKEN: z.string(),
     APPLICATION_ID: z.string(),
     DEV_GUILD_ID: z.string(),
+
+    SEARXNG_API: z.string().optional(),
+
     GRAD_DATA: z.string().optional().default("./data"),
     NODE_ENV: z.enum(["development", "production"]).default("development"),
   },
