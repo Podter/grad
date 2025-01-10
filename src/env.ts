@@ -7,7 +7,8 @@ export const env = createEnv({
     APPLICATION_ID: z.string(),
     DEV_GUILD_ID: z.string(),
 
-    SEARXNG_API: z.string().optional(),
+    OLLAMA_API: z.string().default("http://localhost:11434"),
+    SEARXNG_API: z.string().default("http://localhost:8080"),
 
     GRAD_DATA: z.string().optional().default("./data"),
     NODE_ENV: z.enum(["development", "production"]).default("development"),
