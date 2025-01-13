@@ -4,6 +4,7 @@ import {
   Collection,
   GatewayIntentBits,
   type Message,
+  type MessageReference,
   REST,
 } from "discord.js";
 import { ChatMessagesStore } from "~/ai/lib/message";
@@ -71,7 +72,7 @@ export class Grad extends Client {
     }
   }
 
-  getChatMessagesStore(message: Message) {
+  getChatMessagesStore(message: Message | MessageReference) {
     const index = ChatMessagesStore.messageToChatMessagesStoreSearch(message);
     for (const store of this.chatMessagesStores) {
       if (store.searchIndexes.includes(index)) {

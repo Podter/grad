@@ -1,5 +1,5 @@
-import type { Awaitable, User } from "discord.js";
-import type { Message as DiscordMessage } from "discord.js";
+import type { Awaitable, MessageReference, User } from "discord.js";
+import { Message as DiscordMessage } from "discord.js";
 import type { Message, ToolCall } from "ollama";
 import type { Grad } from "~/lib/grad";
 import {
@@ -102,14 +102,19 @@ export class ChatMessagesStore {
     this.messages.push(message);
   }
 
-  addSearchIndex(message: DiscordMessage) {
+  addSearchIndex(message: DiscordMessage | MessageReference) {
     const searchIndex =
       ChatMessagesStore.messageToChatMessagesStoreSearch(message);
     this.searchIndexes.push(searchIndex);
   }
 
-  static messageToChatMessagesStoreSearch(message: DiscordMessage) {
-    return `${message.channelId}:${message.id}`;
+  static messageToChatMessagesStoreSearch(
+    message: DiscordMessage | MessageReference,
+  ) {
+    if (message instanceof DiscordMessage) {
+      return `${message.channel.id}:${message.id}`;
+    }
+    return `${message.channelId}:${message.messageId}`;
   }
 
   get lastUserMessage(): UserMessage | undefined {

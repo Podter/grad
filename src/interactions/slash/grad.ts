@@ -15,15 +15,17 @@ export const Grad = new SlashCommand({
 
     await interaction.deferReply();
 
-    const messages = new ChatMessagesStore();
-    const userMessage = new UserMessage(interaction.user, message ?? "Hello");
-    messages.add(userMessage);
+    const store = new ChatMessagesStore();
+    grad.chatMessagesStores.push(store);
 
-    const gradMessage = await generateChat(grad, messages);
+    const userMessage = new UserMessage(interaction.user, message ?? "Hello");
+    store.add(userMessage);
+
+    const gradMessage = await generateChat(grad, store);
     const reply = await interaction.editReply({
       content: gradMessage.message,
     });
 
-    messages.addSearchIndex(reply);
+    store.addSearchIndex(reply);
   },
 });
