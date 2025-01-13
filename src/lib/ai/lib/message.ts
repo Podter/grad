@@ -1,10 +1,12 @@
 import type { Awaitable, User } from "discord.js";
 import type { Message, ToolCall } from "ollama";
+import type { Grad } from "~/lib/grad";
 import {
   extractResponse,
   inputPromptTemplate,
   systemPromptTemplate,
 } from "../models/chat";
+import { getGradInfo, getGradMemories } from "../models/vector";
 
 export class BaseMessage {
   toJSON(): Awaitable<Message> {
@@ -97,20 +99,49 @@ export class ChatMessagesStore {
     this.messages.push(message);
   }
 
-  async toOllamaMessages(): Promise<Message[]> {
+  get lastUserMessage(): UserMessage | undefined {
+    const lastUserMessage = this.messages.findLast((message) =>
+      message.isUserMessage(),
+    );
+    return lastUserMessage;
+  }
+
+  get users(): User[] {
+    return this.messages
+      .filter((message) => message.isUserMessage())
+      .map(({ user }) => user)
+      .filter((value, index, self) => self.indexOf(value) === index);
+  }
+
+  async generateSystemPrompt(grad: Grad) {
+    const lastUserMessageContent = this.lastUserMessage?.message ?? "";
+    const [gradInformation, memories] = await Promise.all([
+      getGradInfo(grad, lastUserMessageContent),
+      getGradMemories(
+        grad,
+        lastUserMessageContent,
+        this.users.map((user) => user.id),
+      ),
+    ]);
+
+    const prompt = await systemPromptTemplate.invoke({
+      gradInformation,
+      memories,
+    });
+
+    return prompt.value;
+  }
+
+  async toOllamaMessages(grad: Grad): Promise<Message[]> {
     const [systemPrompt, ...messages] = await Promise.all([
-      // TODO: replace with actual data
-      systemPromptTemplate.invoke({
-        gradInformation: "Likes pizza",
-        memories: "Users are nice",
-      }),
+      this.generateSystemPrompt(grad),
       ...this.messages.map(async (message) => await message.toJSON()),
     ]);
 
     return [
       {
         role: "system",
-        content: systemPrompt.value,
+        content: systemPrompt,
       },
       ...messages,
     ];

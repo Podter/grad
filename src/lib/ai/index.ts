@@ -22,7 +22,7 @@ export async function generateChat(
       num_ctx: 1024, // Max tokens
     },
     tools: tools.map((tool) => tool.toJSON()),
-    messages: await store.toOllamaMessages(),
+    messages: await store.toOllamaMessages(grad),
   });
 
   const message = new AssistantMessage(
