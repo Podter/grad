@@ -13,13 +13,14 @@ import { tools } from "./tools";
 export async function generateChat(
   grad: Grad,
   store: ChatMessagesStore,
+  toolUseCount = 0,
 ): Promise<AssistantMessage> {
   const res = await openai.chat.completions.create({
     model: env.CHAT_MODEL,
     stream: false,
     temperature: 0.7,
     max_tokens: 1024,
-    tool_choice: "auto",
+    tool_choice: toolUseCount > 5 ? "none" : "auto",
     parallel_tool_calls: false,
     tools: tools.map((tool) => tool.toJSON()),
     messages: await store.toOpenAIMessages(grad),
@@ -64,7 +65,7 @@ export async function generateChat(
       store.add(toolMessage);
     }
 
-    return await generateChat(grad, store);
+    return await generateChat(grad, store, toolUseCount + 1);
   }
 
   return message;
