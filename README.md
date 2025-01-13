@@ -75,6 +75,16 @@ bun docker:down
 bun docker:rm
 ```
 
+## More demos
+
+[![Grad demo video](docs/demo-video.png)](https://cloud-qf1jgfhdn-hack-club-bot.vercel.app/02025-01-13_17-10-51.mp4)
+
+> Demo video of Grad in action
+
+![Grad's memory](docs/memory.png)
+
+> Grad remembering user information
+
 ## License
 
 This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more information.
