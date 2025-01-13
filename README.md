@@ -14,7 +14,7 @@ You can change Grad's personality (what she likes, what she loves) by modifying 
 
 You need to rebuild the project after modifying the files.
 
-# Building
+## Building
 
 Make sure you have Bun installed. Then install the dependencies:
 
