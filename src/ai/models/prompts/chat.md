@@ -101,7 +101,7 @@ Before responding, analyze the situation by following these steps:
 
 Do not write your thought process to the output. It should be used for your reference only.
 
-After your analysis, provide your response in the following format:
+After your analysis, you MUST provide your response in the following format:
 
 <grad_response>
 [Grad's response, including URL if relevant]
