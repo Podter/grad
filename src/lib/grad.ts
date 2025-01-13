@@ -13,7 +13,6 @@ import { events } from "~/events";
 import { interactions } from "~/interactions";
 import type { SlashCommand } from "~/interactions/builder";
 import { createEmbeddings } from "../ai/models/vector";
-import { pullModel } from "../ai/ollama";
 import { registerInteractions } from "./utils/register";
 
 export class Grad extends Client {
@@ -37,10 +36,8 @@ export class Grad extends Client {
     this.interactions = new Collection();
     this.chatMessagesStores = [];
 
-    this.pullModels().then(() => {
-      this.load();
-      this.login(env.TOKEN);
-    });
+    this.load();
+    this.login(env.TOKEN);
   }
 
   private async load() {
@@ -58,18 +55,6 @@ export class Grad extends Client {
     consola.success(`Loaded \`${this.interactions.size}\` interactions`);
 
     registerInteractions(this);
-  }
-
-  private async pullModels() {
-    try {
-      await Promise.all([
-        pullModel(env.CHAT_MODEL),
-        pullModel(env.EMBEDDING_MODEL),
-      ]);
-    } catch {
-      consola.error("Failed to pull models");
-      process.exit(1);
-    }
   }
 
   getChatMessagesStore(message: Message | MessageReference) {

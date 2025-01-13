@@ -1,6 +1,9 @@
 import type { Awaitable, MessageReference, User } from "discord.js";
 import { Message as DiscordMessage } from "discord.js";
-import type { Message, ToolCall } from "ollama";
+import type {
+  ChatCompletionMessage,
+  ChatCompletionMessageParam,
+} from "openai/resources/index";
 import type { Grad } from "~/lib/grad";
 import {
   extractResponse,
@@ -10,7 +13,7 @@ import {
 import { getGradInfo, getGradMemories } from "../models/vector";
 
 export class BaseMessage {
-  toJSON(): Awaitable<Message> {
+  toJSON(): Awaitable<ChatCompletionMessageParam> {
     throw new Error("Method not implemented.");
   }
 
@@ -37,7 +40,7 @@ export class UserMessage extends BaseMessage {
     this.message = message;
   }
 
-  async toJSON(): Promise<Message> {
+  async toJSON(): Promise<ChatCompletionMessageParam> {
     const { value } = await inputPromptTemplate.invoke({
       content: this.message,
       username: this.user.displayName,
@@ -51,40 +54,40 @@ export class UserMessage extends BaseMessage {
 }
 
 export class AssistantMessage extends BaseMessage {
-  readonly content: string;
-  readonly toolCalls?: ToolCall[];
+  readonly content: ChatCompletionMessage;
 
-  constructor(content: string, toolCalls?: ToolCall[]) {
+  constructor(content: ChatCompletionMessage) {
     super();
     this.content = content;
-    this.toolCalls = toolCalls;
   }
 
   get message(): string {
-    return extractResponse(this.content);
+    return extractResponse(this.content.content ?? "");
   }
 
-  toJSON(): Message {
-    return {
-      role: "assistant",
-      content: this.content,
-      tool_calls: this.toolCalls,
-    };
+  toJSON(): ChatCompletionMessageParam {
+    return this.content;
   }
 }
 
-export class ToolResultMessage extends BaseMessage {
-  readonly result: string | object;
+export interface ToolResult {
+  id: string;
+  content: string | object;
+}
 
-  constructor(result: string | object) {
+export class ToolResultMessage extends BaseMessage {
+  readonly result: ToolResult;
+
+  constructor(result: ToolResult) {
     super();
     this.result = result;
   }
 
-  toJSON(): Message {
+  toJSON(): ChatCompletionMessageParam {
     return {
       role: "tool",
-      content: JSON.stringify(this.result, null, 2),
+      tool_call_id: this.result.id,
+      content: JSON.stringify(this.result.content, null, 2),
     };
   }
 }
@@ -150,7 +153,7 @@ export class ChatMessagesStore {
     return prompt.value;
   }
 
-  async toOllamaMessages(grad: Grad): Promise<Message[]> {
+  async toOpenAIMessages(grad: Grad): Promise<ChatCompletionMessageParam[]> {
     const [systemPrompt, ...messages] = await Promise.all([
       this.generateSystemPrompt(grad),
       ...this.messages.map(async (message) => await message.toJSON()),

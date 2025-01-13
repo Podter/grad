@@ -1,5 +1,5 @@
 import path from "node:path";
-import { OllamaEmbeddings } from "@langchain/ollama";
+import { OpenAIEmbeddings } from "@langchain/openai";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { create } from "xmlbuilder2";
 import { env } from "~/env";
@@ -7,9 +7,12 @@ import type { Grad } from "~/lib/grad";
 import { GRAD_INFO, GRAD_INFO_PATH, MEMORIES_PATH } from "../constants";
 import { UpsertMemory } from "../tools/upsert-memory";
 
-const embeddings = new OllamaEmbeddings({
+const embeddings = new OpenAIEmbeddings({
   model: env.EMBEDDING_MODEL,
-  baseUrl: env.OLLAMA_API,
+  configuration: {
+    baseURL: env.OPENAI_BASE_URL,
+  },
+  apiKey: env.OPENAI_API_KEY,
 });
 
 export async function createEmbeddings() {
@@ -25,7 +28,7 @@ class FileVectorStore extends MemoryVectorStore {
     await Bun.write(path, JSON.stringify(this.memoryVectors));
   }
 
-  static async fromJSONFile(path: string, embeddings: OllamaEmbeddings) {
+  static async fromJSONFile(path: string, embeddings: OpenAIEmbeddings) {
     // biome-ignore lint/complexity/noThisInStatic: langchain source code pattern
     const instance = new this(embeddings);
     const data: MemoryVectorStore["memoryVectors"] =

@@ -7,7 +7,9 @@ export const env = createEnv({
     APPLICATION_ID: z.string(),
     DEV_GUILD_ID: z.string(),
 
-    OLLAMA_API: z.string(),
+    OPENAI_BASE_URL: z.string().optional(),
+    OPENAI_API_KEY: z.string(),
+
     SEARXNG_API: z.string(),
 
     CHAT_MODEL: z.string(),

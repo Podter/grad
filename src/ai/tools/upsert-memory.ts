@@ -6,7 +6,7 @@ export const UpsertMemory = new Tool({
   name: "upsert_memory",
   description: "Upsert a memory in the database.",
   schema: z.object({
-    content: z.string().describe("The content of the memory."),
+    content: z.string().describe("The content of the memory in plain text."),
     userId: z.string().describe("User ID of the memory owner."),
   }),
   execute({ content, userId }, grad) {

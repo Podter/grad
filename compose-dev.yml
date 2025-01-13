@@ -1,13 +1,4 @@
 services:
-  ollama:
-    image: ollama/ollama:latest
-    # image: ollama/ollama:rocm
-    restart: unless-stopped
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama-data:/root/.ollama
-
   searxng:
     image: searxng/searxng:latest
     restart: unless-stopped
@@ -15,6 +6,3 @@ services:
       - "8080:8080"
     volumes:
       - ./configs/searxng/settings.yml:/etc/searxng/settings.yml:ro
-
-volumes:
-  ollama-data:

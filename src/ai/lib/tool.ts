@@ -1,5 +1,5 @@
 import type { Awaitable } from "discord.js";
-import type { Tool as OllamaTool } from "ollama";
+import type { ChatCompletionTool } from "openai/resources/index";
 import type { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import type { Grad } from "~/lib/grad";
@@ -37,10 +37,10 @@ export class Tool<T extends z.ZodObject<any>> {
     this.execute = execute;
   }
 
-  async run(args: unknown, grad: Grad): Promise<string | object | ToolError> {
+  async run(args: string, grad: Grad): Promise<string | object | ToolError> {
     try {
-      // @ts-expect-error - this is fine
-      const result = await this.execute(args, grad);
+      const parsed = this.schema.parse(JSON.parse(args));
+      const result = await this.execute(parsed, grad);
       return result;
     } catch (e) {
       return {
@@ -50,13 +50,12 @@ export class Tool<T extends z.ZodObject<any>> {
     }
   }
 
-  toJSON(): OllamaTool {
+  toJSON(): ChatCompletionTool {
     return {
       type: "function",
       function: {
         name: this.name,
         description: this.description,
-        // @ts-expect-error - type is incorrect
         parameters: zodToJsonSchema(this.schema),
       },
     };
