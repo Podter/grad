@@ -1,5 +1,10 @@
 import type { Awaitable, User } from "discord.js";
 import type { Message, ToolCall } from "ollama";
+import {
+  extractResponse,
+  inputPromptTemplate,
+  systemPromptTemplate,
+} from "../models/chat";
 
 export class BaseMessage {
   toJSON(): Awaitable<Message> {
@@ -29,10 +34,15 @@ export class UserMessage extends BaseMessage {
     this.message = message;
   }
 
-  toJSON(): Message {
+  async toJSON(): Promise<Message> {
+    const { value } = await inputPromptTemplate.invoke({
+      content: this.message,
+      username: this.user.displayName,
+      userId: this.user.id,
+    });
     return {
       role: "user",
-      content: this.message,
+      content: value,
     };
   }
 }
@@ -47,13 +57,9 @@ export class AssistantMessage extends BaseMessage {
     this.toolCalls = toolCalls;
   }
 
-  // get message(): string {
-  //   if (typeof this.content === "string") {
-  //     return extractResponse(this.content);
-  //   }
-  //   const message = this.content.find((block) => block.type === "text");
-  //   return extractResponse(message?.text ?? "");
-  // }
+  get message(): string {
+    return extractResponse(this.content);
+  }
 
   toJSON(): Message {
     return {
@@ -92,9 +98,21 @@ export class ChatMessagesStore {
   }
 
   async toOllamaMessages(): Promise<Message[]> {
-    const result = await Promise.all(
-      this.messages.map(async (message) => await message.toJSON()),
-    );
-    return result;
+    const [systemPrompt, ...messages] = await Promise.all([
+      // TODO: replace with actual data
+      systemPromptTemplate.invoke({
+        gradInformation: "Likes pizza",
+        memories: "Users are nice",
+      }),
+      ...this.messages.map(async (message) => await message.toJSON()),
+    ]);
+
+    return [
+      {
+        role: "system",
+        content: systemPrompt.value,
+      },
+      ...messages,
+    ];
   }
 }
