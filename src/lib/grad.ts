@@ -4,8 +4,8 @@ import { env } from "~/env";
 import { events } from "~/events";
 import { interactions } from "~/interactions";
 import type { SlashCommand } from "~/interactions/builder";
-import { createEmbeddings } from "./ai/models/vector";
-import { pullModel } from "./ai/ollama";
+import { createEmbeddings } from "../ai/models/vector";
+import { pullModel } from "../ai/ollama";
 import { registerInteractions } from "./utils/register";
 
 export class Grad extends Client {

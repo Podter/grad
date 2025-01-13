@@ -1,6 +1,6 @@
 import consola from "consola";
 import { env } from "~/env";
-import type { Grad } from "../grad";
+import type { Grad } from "../lib/grad";
 import {
   AssistantMessage,
   type ChatMessagesStore,
