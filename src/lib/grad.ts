@@ -4,7 +4,7 @@ import { env } from "~/env";
 import { events } from "~/events";
 import { interactions } from "~/interactions";
 import type { SlashCommand } from "~/interactions/builder";
-import { pullModel } from "./ollama";
+import { pullModel } from "./ai/ollama";
 import { registerInteractions } from "./utils/register";
 
 export class Grad extends Client {
@@ -35,9 +35,14 @@ export class Grad extends Client {
   }
 
   private async pullModels() {
-    await Promise.all([
-      pullModel(env.CHAT_MODEL),
-      pullModel(env.EMBEDDING_MODEL),
-    ]);
+    try {
+      await Promise.all([
+        pullModel(env.CHAT_MODEL),
+        pullModel(env.EMBEDDING_MODEL),
+      ]);
+    } catch {
+      consola.error("Failed to pull models");
+      process.exit(1);
+    }
   }
 }
