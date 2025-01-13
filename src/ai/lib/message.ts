@@ -1,4 +1,5 @@
 import type { Awaitable, User } from "discord.js";
+import type { Message as DiscordMessage } from "discord.js";
 import type { Message, ToolCall } from "ollama";
 import type { Grad } from "~/lib/grad";
 import {
@@ -90,13 +91,25 @@ export class ToolResultMessage extends BaseMessage {
 
 export class ChatMessagesStore {
   readonly messages: BaseMessage[];
+  readonly searchIndexes: string[];
 
   constructor() {
     this.messages = [];
+    this.searchIndexes = [];
   }
 
   add(message: BaseMessage) {
     this.messages.push(message);
+  }
+
+  addSearchIndex(message: DiscordMessage) {
+    const searchIndex =
+      ChatMessagesStore.messageToChatMessagesStoreSearch(message);
+    this.searchIndexes.push(searchIndex);
+  }
+
+  static messageToChatMessagesStoreSearch(message: DiscordMessage) {
+    return `${message.channelId}:${message.id}`;
   }
 
   get lastUserMessage(): UserMessage | undefined {

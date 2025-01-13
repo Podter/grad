@@ -1,5 +1,12 @@
 import consola from "consola";
-import { Client, Collection, REST } from "discord.js";
+import {
+  Client,
+  Collection,
+  GatewayIntentBits,
+  type Message,
+  REST,
+} from "discord.js";
+import { ChatMessagesStore } from "~/ai/lib/message";
 import { env } from "~/env";
 import { events } from "~/events";
 import { interactions } from "~/interactions";
@@ -14,11 +21,20 @@ export class Grad extends Client {
   memories!: Awaited<ReturnType<typeof createEmbeddings>>["memories"];
   infoMemories!: Awaited<ReturnType<typeof createEmbeddings>>["gradInfo"];
 
+  chatMessagesStores: ChatMessagesStore[];
+
   constructor() {
-    super({ intents: [] });
+    super({
+      intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+      ],
+    });
 
     this.rest = new REST().setToken(env.TOKEN);
     this.interactions = new Collection();
+    this.chatMessagesStores = [];
 
     this.pullModels().then(() => {
       this.load();
@@ -53,5 +69,15 @@ export class Grad extends Client {
       consola.error("Failed to pull models");
       process.exit(1);
     }
+  }
+
+  getChatMessagesStore(message: Message) {
+    const index = ChatMessagesStore.messageToChatMessagesStoreSearch(message);
+    for (const store of this.chatMessagesStores) {
+      if (store.searchIndexes.includes(index)) {
+        return store;
+      }
+    }
+    return undefined;
   }
 }
