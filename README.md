@@ -4,6 +4,17 @@
 
 Grad is a Discord AI chatbot with tools. She can search the web, use calculator, and remembering user information!
 
+## Background
+
+If you have known me for a while, you might have heard of my own Discord bot called Brad.
+Brad is my own Discord bot (closed-source) that I have been developing for a while. He can do a lot of things.
+I'm very proud of implementing my own framework for Brad, so I wanted to open-source it.
+The problem is, I don't really want to open the system prompt and specific code that I use for Brad.
+
+So, I decided to create a new Discord bot called Grad. Grad is a new Discord bot that is based on Brad.
+Grad has some shared codebase with Brad, but Grad has a different system prompt and AI provider. (Uses OpenAI instead of Anthropic)
+It is more flexible and open-source. You can modify any part of the codebase to suit your needs.
+
 ## Getting started
 
 Quickest way to get started is create a Discord bot and invite it to your server.
@@ -21,6 +32,8 @@ docker compose up -d
 You can change the system prompt by modifying `src/ai/models/prompts/chat.md`.
 
 You can change Grad's personality (what she likes, what she loves) by modifying `GRAD_INFO` array in `src/ai/constants.ts`.
+
+You can add more tools by exporting a new `Tool` instance in `src/ai/tools/*.ts`, don't forget to import it in `src/ai/tools/index.ts`.
 
 You need to rebuild the project after modifying the files. (`docker compose up -d --build`)
 
