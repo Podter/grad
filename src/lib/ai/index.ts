@@ -21,7 +21,7 @@ export async function generateChat(
       temperature: 0.7,
       num_ctx: 1024, // Max tokens
     },
-    tools: [],
+    tools: tools.map((tool) => tool.toJSON()),
     messages: await store.toOllamaMessages(),
   });
 
